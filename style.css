@@ -170,16 +170,13 @@ body{
 .shelf-section h2{margin:0 0 10px; font-size:1.15rem; letter-spacing:.1em; color:#ffe9a8;}
 /* ---------- tape carousel ---------- */
 .carousel{display:flex; align-items:center; gap:8px; width:100%; margin-top:4px;}
-.car-viewport{overflow:hidden; flex:1; padding:20px 4px 24px; touch-action:pan-y; cursor:grab;
-  -webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);
-  mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);}
+.car-viewport{overflow:hidden; flex:1; padding:20px 4px 24px; touch-action:pan-y; cursor:grab;}
 .car-viewport:active{cursor:grabbing;}
 .car-track{display:flex; gap:16px; width:max-content; margin:0 auto;
   transition:transform .38s cubic-bezier(.3,.8,.3,1); will-change:transform;}
 .car-track.dragging{transition:none;}
 .car-track.no-anim{transition:none;}
-.car-cell{flex:0 0 auto; backface-visibility:hidden;
-  transition:transform .38s cubic-bezier(.3,.8,.3,1), opacity .38s ease, filter .38s ease;}
+.car-cell{flex:0 0 auto; transition:transform .38s cubic-bezier(.3,.8,.3,1), opacity .38s ease, filter .38s ease;}
 .car-btn{flex:0 0 auto; width:46px; height:46px; border-radius:50%; border:0; cursor:pointer;
   font-size:1.6rem; line-height:1; color:var(--ink); padding-bottom:4px;
   background:radial-gradient(circle at 35% 30%, #ffe9a8, var(--btn) 55%, var(--btn-dark));
@@ -195,8 +192,6 @@ body{
   --accent:#ffd75e;
   flex:0 0 auto; width:196px; cursor:pointer; border:0;
   padding:10px 10px 4px; position:relative;
-  -webkit-font-smoothing:antialiased;
-  -webkit-box-reflect:below 6px linear-gradient(transparent 55%, rgba(255,255,255,.20));
   background:linear-gradient(165deg,#3a484f 0%,#232f36 45%,#121b20 100%);
   color:var(--bmo-cream); border-radius:12px;
   box-shadow:0 12px 24px rgba(0,0,0,.55), inset 0 2px 0 rgba(255,255,255,.14), inset 0 -3px 6px rgba(0,0,0,.4);
