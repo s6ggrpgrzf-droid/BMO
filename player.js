@@ -92,7 +92,10 @@ const viewport = $("carViewport"), track = $("shelf"), dotsBox = $("carDots");
 let carIndex = 0;
 function cellW() {
   const cell = track.querySelector(".car-cell");
-  return cell ? cell.getBoundingClientRect().width + 16 : 212;
+  // offsetWidth: layout width, unaffected by the scale/tilt transforms.
+  // (getBoundingClientRect would measure the transformed width, which changes
+  // with carIndex and made later tapes drift off-center.)
+  return cell ? cell.offsetWidth + 16 : 212;
 }
 function layoutCarousel(animate = true) {
   const n = TAPES.length, cw = cellW(), vw = viewport.clientWidth;
