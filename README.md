@@ -1,6 +1,6 @@
 # BMO · Interactive Video Player
 
-A little BMO that plays BMO stuff only. The player itself is BMO — pick a VHS tape from the shelf and it plays official Cartoon Network BMO clips, with CRT static transitions, synthesized chiptune + sound effects (all generated in-browser, no audio files), a blinking BMO face that follows your cursor, and a couple of hidden surprises (try typing `bmo`… or `football`).
+A little BMO that plays BMO stuff only. The player itself is BMO — pick a VHS tape from the carousel and it plays official Cartoon Network BMO clips, with CRT static transitions, synthesized chiptune + sound effects (all generated in-browser, no audio files), a blinking BMO face that follows your cursor, and a couple of hidden surprises (try typing `bmo`… or `football`).
 
 ## What's inside
 - **9 tapes**: Best of BMO compilation, the cowboy LARP run (Me-Mow Returns, Cowboy LARP, Sandwich Showdown), the Football saga (Football Vs. BMO, Are You Ready For Some Football?, AMO Vs. BMO), and Distant Lands previews — all official Cartoon Network clips.

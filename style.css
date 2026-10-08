@@ -168,12 +168,29 @@ body{
 /* ---------- tape shelf ---------- */
 .shelf-section{width:100%; margin-top:34px; text-align:center;}
 .shelf-section h2{margin:0 0 10px; font-size:1.15rem; letter-spacing:.1em; color:#ffe9a8;}
-.shelf{display:flex; gap:14px; overflow-x:auto; padding:14px 6px 20px; justify-content:flex-start;
-  scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;}
-@media(min-width:760px){.shelf{justify-content:center; flex-wrap:wrap; overflow:visible;}}
+/* ---------- tape carousel ---------- */
+.carousel{display:flex; align-items:center; gap:8px; width:100%; margin-top:4px;}
+.car-viewport{overflow:hidden; flex:1; padding:20px 4px 24px; touch-action:pan-y; cursor:grab;}
+.car-viewport:active{cursor:grabbing;}
+.car-track{display:flex; gap:16px; width:max-content; margin:0 auto;
+  transition:transform .38s cubic-bezier(.3,.8,.3,1); will-change:transform;}
+.car-track.dragging{transition:none;}
+.car-track.no-anim{transition:none;}
+.car-cell{flex:0 0 auto; transition:transform .38s cubic-bezier(.3,.8,.3,1), opacity .38s ease, filter .38s ease;}
+.car-btn{flex:0 0 auto; width:46px; height:46px; border-radius:50%; border:0; cursor:pointer;
+  font-size:1.6rem; line-height:1; color:var(--ink); padding-bottom:4px;
+  background:radial-gradient(circle at 35% 30%, #ffe9a8, var(--btn) 55%, var(--btn-dark));
+  box-shadow:0 4px 0 #a37c22, 0 6px 12px rgba(0,0,0,.4);
+  display:flex; align-items:center; justify-content:center;
+  transition:transform .08s ease, box-shadow .08s ease;}
+.car-btn:active{transform:translateY(3px); box-shadow:0 1px 0 #a37c22, 0 3px 8px rgba(0,0,0,.4);}
+.car-dots{display:flex; gap:8px; justify-content:center; margin:0 0 4px; padding:0;}
+.car-dots button{width:10px; height:10px; border-radius:50%; border:0; padding:0; cursor:pointer;
+  background:rgba(255,255,255,.25); transition:transform .2s ease, background .2s ease;}
+.car-dots button.on{background:var(--btn); transform:scale(1.4); box-shadow:0 0 8px rgba(255,215,94,.7);}
 .tape{
   --accent:#ffd75e;
-  scroll-snap-align:center; flex:0 0 auto; width:196px; cursor:pointer; border:0;
+  flex:0 0 auto; width:196px; cursor:pointer; border:0;
   padding:10px 10px 4px; position:relative;
   background:linear-gradient(165deg,#3a484f 0%,#232f36 45%,#121b20 100%);
   color:var(--bmo-cream); border-radius:12px;
@@ -246,6 +263,7 @@ body{
 @media (prefers-reduced-motion: reduce){
   .stars,.cloud,.face-prompt,.screen.playing .scanlines{animation:none !important;}
   .tape.playing .reel{animation:none;}
+  .car-track,.car-cell{transition:none !important;}
 }
 
 /* ============ v2 additions: boot, transport, up-next, help, sleepy ============ */

@@ -72,7 +72,7 @@ function buildShelf() {
       '<span class="screws"><i></i><i></i><i></i><i></i></span></span>' +
       '<a class="watch-link" href="https://www.youtube.com/watch?v=' + t.id +
       '" target="_blank" rel="noopener">watch on YouTube ↗</a>';
-    const play = () => { BMOAudio.unlock(); flyTape(b, i); };
+    const play = () => { BMOAudio.unlock(); carCenter(i); flyTape(b, i); };
     b.addEventListener("click", (e) => {
       if (e.target.closest(".watch-link")) return; // let the link work
       play();
@@ -80,8 +80,81 @@ function buildShelf() {
     b.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") { e.preventDefault(); play(); }
     });
-    shelf.appendChild(b);
+    const cell = document.createElement("div");
+    cell.className = "car-cell";
+    cell.appendChild(b);
+    shelf.appendChild(cell);
   });
+}
+
+/* ---------------- tape carousel (cover flow) ---------------- */
+const viewport = $("carViewport"), track = $("shelf"), dotsBox = $("carDots");
+let carIndex = 0;
+function cellW() {
+  const cell = track.querySelector(".car-cell");
+  return cell ? cell.getBoundingClientRect().width + 16 : 212;
+}
+function layoutCarousel(animate = true) {
+  const n = TAPES.length, cw = cellW(), vw = viewport.clientWidth;
+  const x = vw / 2 - (carIndex * cw + cw / 2);
+  if (!animate) track.classList.add("no-anim");
+  track.style.transform = `translateX(${x}px)`;
+  if (!animate) { void track.offsetWidth; track.classList.remove("no-anim"); }
+  [...track.children].forEach((cell, i) => {
+    const a = Math.min(Math.abs(i - carIndex), 2);
+    cell.style.transform = `scale(${1 - a * 0.14})`;
+    cell.style.opacity = `${1 - a * 0.28}`;
+    cell.style.filter = `brightness(${1 - a * 0.18})`;
+    cell.style.zIndex = `${10 - a}`;
+  });
+  [...dotsBox.children].forEach((d, i) => d.classList.toggle("on", i === carIndex));
+}
+function carCenter(i) { carIndex = ((i % TAPES.length) + TAPES.length) % TAPES.length; layoutCarousel(); }
+function carGo(d) {
+  carCenter(carIndex + d);
+  BMOAudio.sfx.click();
+}
+function buildDots() {
+  TAPES.forEach((t, i) => {
+    const d = document.createElement("button");
+    d.setAttribute("aria-label", "Go to tape " + (i + 1) + ": " + t.title);
+    d.onclick = () => carGo(i - carIndex);
+    dotsBox.appendChild(d);
+  });
+}
+/* drag / swipe */
+let dragX = null, dragBase = 0, dragMoved = false;
+function trackX() {
+  const m = /translateX\((-?\d+\.?\d*)px\)/.exec(track.style.transform || "");
+  return m ? +m[1] : 0;
+}
+function bindCarousel() {
+  $("carPrev").onclick = () => carGo(-1);
+  $("carNext").onclick = () => carGo(1);
+  viewport.addEventListener("pointerdown", (e) => {
+    dragX = e.clientX; dragBase = trackX(); dragMoved = false;
+    track.classList.add("dragging");
+  });
+  viewport.addEventListener("pointermove", (e) => {
+    if (dragX === null) return;
+    const dx = e.clientX - dragX;
+    if (Math.abs(dx) > 10) dragMoved = true;
+    track.style.transform = `translateX(${dragBase + dx}px)`;
+  });
+  const endDrag = (e) => {
+    if (dragX === null) return;
+    const dx = e.clientX - dragX;
+    track.classList.remove("dragging");
+    carCenter(carIndex - Math.round(dx / cellW()));
+    dragX = null;
+  };
+  viewport.addEventListener("pointerup", endDrag);
+  viewport.addEventListener("pointercancel", endDrag);
+  // a drag that becomes a swipe must not also trigger the tape's click
+  viewport.addEventListener("click", (e) => {
+    if (dragMoved) { e.stopPropagation(); e.preventDefault(); dragMoved = false; }
+  }, true);
+  addEventListener("resize", () => layoutCarousel(false));
 }
 /* ---------------- tape fly-to-BMO ---------------- */
 function flyTape(el, i) {
@@ -105,7 +178,7 @@ function flyTape(el, i) {
   setTimeout(() => insertTape(i), 380);
 }
 function markActive() {
-  [...shelf.children].forEach((el) => {
+  shelf.querySelectorAll(".tape").forEach((el) => {
     const active = pos >= 0 && order[pos] === +el.dataset.i;
     el.classList.toggle("active", active);
     el.classList.toggle("playing", active && playing);
@@ -475,5 +548,6 @@ function bind() {
 }
 
 /* ---------------- go ---------------- */
-buildShelf(); bind(); blinkLoop(); fireflies(); boot();
+buildShelf(); buildDots(); bind(); bindCarousel(); blinkLoop(); fireflies(); boot();
+layoutCarousel(false);
 })();
