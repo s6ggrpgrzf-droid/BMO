@@ -226,6 +226,7 @@ function insertTape(i) {
     face.classList.add("hidden");
     screen.classList.add("playing");
     started = true; playing = true;
+    if (musReady && mus) { try { mus.pauseVideo(); } catch (err) {} } // no mixtape under a tape
     if (!fallbackMode) transport.classList.remove("dim");
     pfill.style.width = "0%"; tCur.textContent = "0:00"; tDur.textContent = "0:00";
     say("Now playing: " + tape.title);
@@ -284,6 +285,8 @@ function toggleShuffle() {
 }
 
 /* ---------------- YouTube IFrame API ---------------- */
+const MIXTAPE_ID = "I80gKfqy52Y"; // BMO's Mixtape — official WaterTower Music upload, real Niki Yang BMO vocals
+let mus = null, musReady = false, musPlaying = false;
 window.onYouTubeIframeAPIReady = () => {
   yt = new YT.Player("ytmount", {
     width: "100%", height: "100%",
@@ -304,6 +307,23 @@ window.onYouTubeIframeAPIReady = () => {
           celebrate();
           setTimeout(() => nextTape(true), 1800);
         }
+      },
+    },
+  });
+  // hidden music channel: the real BMO mixtape
+  mus = new YT.Player("musmount", {
+    width: "2", height: "2", videoId: MIXTAPE_ID,
+    playerVars: { rel: 0, playsinline: 1 },
+    events: {
+      onReady: () => {
+        musReady = true;
+        try { mus.setVolume(70); } catch (err) {}
+      },
+      onStateChange: (e) => {
+        musPlaying = (e.data === YT.PlayerState.PLAYING);
+        const on = musPlaying || BMOAudio.isMusicOn();
+        $("btnMusic").classList.toggle("on", on);
+        $("btnMusic").setAttribute("aria-pressed", String(on));
       },
     },
   });
@@ -362,6 +382,37 @@ if (!reduceMotion) {
       el.style.transform = `translate(${(dx * 8).toFixed(1)}px, ${(dy * 6).toFixed(1)}px)`;
     });
   }, { passive: true });
+}
+
+/* ---------------- living sky: mini-BMO floaties + shooting stars ---------------- */
+function floaties() {
+  if (reduceMotion) return;
+  const box = $("floaties");
+  for (let i = 0; i < 14; i++) {
+    const f = document.createElement("div");
+    f.className = "floatie";
+    const s = 0.45 + Math.random() * 0.85;
+    f.style.left = (Math.random() * 100) + "vw";
+    f.style.width = Math.round(44 * s) + "px";
+    f.style.height = Math.round(58 * s) + "px";
+    f.style.opacity = (0.22 + Math.random() * 0.45).toFixed(2);
+    f.style.animationDuration = (16 + Math.random() * 18).toFixed(1) + "s";
+    f.style.animationDelay = (-Math.random() * 30).toFixed(1) + "s";
+    box.appendChild(f);
+  }
+  (function shoot() {
+    setTimeout(() => {
+      if (!document.hidden) {
+        const st = document.createElement("div");
+        st.className = "shoot";
+        st.style.top = (Math.random() * 32) + "vh";
+        st.style.right = "-40px";
+        box.appendChild(st);
+        setTimeout(() => st.remove(), 1500);
+      }
+      shoot();
+    }, 4500 + Math.random() * 6500);
+  })();
 }
 
 /* ---------------- fireflies ---------------- */
@@ -507,11 +558,20 @@ addEventListener("pointerdown", function firstBoot() {
 
 /* ---------------- buttons ---------------- */
 function toggleMusic() {
-  const on = BMOAudio.setMusic(!BMOAudio.isMusicOn());
-  $("btnMusic").classList.toggle("on", BMOAudio.isMusicOn());
-  $("btnMusic").setAttribute("aria-pressed", String(BMOAudio.isMusicOn()));
-  say(BMOAudio.isMusicOn() ? "Music on! Beep boop!" : "Music off.");
-  if (!on) BMOAudio.sfx.click();
+  BMOAudio.unlock();
+  if (musReady && mus) {
+    // the real BMO: official WaterTower mixtape, streamed from their upload
+    try {
+      if (musPlaying) { mus.pauseVideo(); say("Mixtape paused."); }
+      else { mus.playVideo(); say("BMO's Mixtape — the real BMO!"); }
+    } catch (err) {}
+  } else {
+    // offline fallback: the synth loop
+    BMOAudio.setMusic(!BMOAudio.isMusicOn());
+    $("btnMusic").classList.toggle("on", BMOAudio.isMusicOn());
+    $("btnMusic").setAttribute("aria-pressed", String(BMOAudio.isMusicOn()));
+    say(BMOAudio.isMusicOn() ? "Music on! Beep boop!" : "Music off.");
+  }
 }
 function toggleFull() {
   BMOAudio.sfx.click();
@@ -548,6 +608,6 @@ function bind() {
 }
 
 /* ---------------- go ---------------- */
-buildShelf(); buildDots(); bind(); bindCarousel(); blinkLoop(); fireflies(); boot();
+buildShelf(); buildDots(); bind(); bindCarousel(); blinkLoop(); fireflies(); floaties(); boot();
 layoutCarousel(false);
 })();

@@ -8,7 +8,7 @@ A little BMO that plays BMO stuff only. The player itself is BMO — pick a VHS 
 - **Tape insert animation**: tapes fly into BMO's screen with a ka-chunk.
 - **Real player chrome**: seekable progress bar, time display, volume slider (YouTube IFrame API).
 - **Sleepy BMO**: leave him alone for 45 seconds and he dozes off — tap to wake him.
-- **Up next** strip, **shuffle**, **music toggle** (generative chiptune), **fullscreen**, keyboard shortcuts (`?`), confetti celebrations, auto-advance.
+- **Up next** strip, **shuffle**, **music toggle** (the real BMO mixtape via WaterTower Music — Niki Yang's BMO vocals, streamed from their official upload; synth loop fallback offline), **fullscreen**, keyboard shortcuts (`?`), confetti celebrations, auto-advance.
 - Respects `prefers-reduced-motion`; big touch targets for phones.
 
 ## Run it
