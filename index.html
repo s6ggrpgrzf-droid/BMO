@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#0b2b33">
 <meta name="description" content="BMO — an interactive video player that plays BMO stuff only.">
 <title>BMO · Interactive Video Player</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='8' y='4' width='48' height='56' rx='12' fill='%235fc3ae'/%3E%3Cellipse cx='24' cy='26' rx='5' ry='7' fill='%23111'/%3E%3Cellipse cx='40' cy='26' rx='5' ry='7' fill='%23111'/%3E%3Cpath d='M24 44 Q32 50 40 44' stroke='%23111' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -47,6 +48,11 @@
               <p class="face-prompt">tap a tape below</p>
             </div>
             <div class="nowplaying" id="nowPlaying" aria-hidden="true"><span></span></div>
+            <div class="boot" id="boot" aria-hidden="true">
+              <div class="boot-logo">BMO</div>
+              <div class="boot-bar"><i></i></div>
+              <p>beemo os v2.6</p>
+            </div>
           </div>
         </div>
 
@@ -61,6 +67,15 @@
             <button class="cbtn mini" id="btnMusic" aria-label="Toggle music" title="Music on/off" aria-pressed="false">🎵</button>
             <button class="cbtn mini" id="btnFull" aria-label="Fullscreen" title="Fullscreen">⛶</button>
             <button class="cbtn mini" id="btnQuote" aria-label="BMO says something" title="BMO says…">💬</button>
+            <button class="cbtn mini" id="btnHelp" aria-label="Show shortcuts" title="Shortcuts">?</button>
+          </div>
+          <div class="transport" id="transport">
+            <span class="tcode" id="tCur">0:00</span>
+            <div class="pbar" id="pbar" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <div class="pfill" id="pfill"></div>
+            </div>
+            <span class="tcode" id="tDur">0:00</span>
+            <input type="range" id="vol" min="0" max="100" value="80" aria-label="Volume">
           </div>
           <div class="grille" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
         </div>
@@ -74,7 +89,8 @@
     <section class="shelf-section">
       <h2>📼 Tape shelf</h2>
       <div class="shelf" id="shelf"></div>
-      <p class="shelf-hint">Tip: press <kbd>B</kbd><kbd>M</kbd><kbd>O</kbd> for a surprise.</p>
+      <p class="upnext" id="upnext">Up next: <span id="upnextList">—</span></p>
+      <p class="shelf-hint">Tip: press <kbd>B</kbd><kbd>M</kbd><kbd>O</kbd> for a surprise. Press <kbd>?</kbd> for shortcuts.</p>
     </section>
 
     <footer class="credits">
@@ -83,6 +99,21 @@
   </main>
 
   <div class="confetti-layer" id="confetti" aria-hidden="true"></div>
+
+  <div class="help" id="help" hidden>
+    <div class="help-card" role="dialog" aria-label="Keyboard shortcuts">
+      <h3>BMO shortcuts</h3>
+      <ul>
+        <li><kbd>Space</kbd> play / pause</li>
+        <li><kbd>←</kbd> <kbd>→</kbd> previous / next tape</li>
+        <li><kbd>M</kbd> music on/off</li>
+        <li><kbd>F</kbd> fullscreen</li>
+        <li><kbd>?</kbd> this panel</li>
+        <li><kbd>B</kbd><kbd>M</kbd><kbd>O</kbd> surprise</li>
+      </ul>
+      <button class="cbtn mini" id="btnHelpClose" aria-label="Close">✕</button>
+    </div>
+  </div>
 
   <script src="audio.js"></script>
   <script src="player.js"></script>

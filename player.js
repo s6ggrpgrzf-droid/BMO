@@ -11,6 +11,9 @@ const TAPES = [
   { id: "6kmxzrjqQc8", short: "SANDWICH SHOWDOWN", title: "Jake vs the Sentient Sandwiches", blurb: "Dead Goat Gulch showdown" },
   { id: "SpS2lc8GjKM", short: "LASSO LUNCH",    title: "BMO Lassos Lunch",        blurb: "Distant Lands preview" },
   { id: "XTuUoeNNrB8", short: "DISTANT LANDS",  title: "Distant Lands: BMO",      blurb: "BMO in space preview" },
+  { id: "mWPkk8gvj3c", short: "FOOTBALL VS BMO", title: "Football Vs. BMO",       blurb: "Mirror alter-ego showdown" },
+  { id: "rqWK3JDwD8g", short: "READY FOR FOOTBALL", title: "Are You Ready For Some Football?", blurb: "Football's big moment" },
+  { id: "AI7Gi9UOiII", short: "AMO VS BMO",      title: "AMO Vs. BMO",             blurb: "Evil sibling AMO attacks" },
 ];
 const QUOTES = [
   "Who wants to play video games?!",
@@ -20,6 +23,8 @@ const QUOTES = [
   "Oh, Football…",
   "Time to play a tape!",
   "Be more!",
+  "Let's play a game!",
+  "Ooooh, shiny!",
 ];
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -27,7 +32,10 @@ const $ = (id) => document.getElementById(id);
 const screen = $("screen"), face = $("face"), shelf = $("shelf"),
       speech = $("speech"), speechText = $("speechText"),
       nowPlaying = $("nowPlaying"), bmo = $("bmo"),
-      staticCv = $("static"), confettiLayer = $("confetti");
+      staticCv = $("static"), confettiLayer = $("confetti"),
+      bootEl = $("boot"), transport = $("transport"),
+      pbar = $("pbar"), pfill = $("pfill"), tCur = $("tCur"), tDur = $("tDur"),
+      vol = $("vol"), upnextList = $("upnextList"), help = $("help");
 
 let order = TAPES.map((_, i) => i);   // play order (shuffled or sequential)
 let pos = -1;                          // position inside order
@@ -48,18 +56,23 @@ function sayQuote() {
 }
 
 /* ---------------- tape shelf ---------------- */
+const ACCENTS = ["#ffd75e","#ff8fb2","#7bc96f","#4a90d9","#c39bff","#ff9a5e","#5fd4c4","#f75f6e","#9fe8d2"];
 function buildShelf() {
   TAPES.forEach((t, i) => {
     const b = document.createElement("div");
     b.className = "tape"; b.dataset.i = i;
     b.tabIndex = 0; b.setAttribute("role", "button");
     b.setAttribute("aria-label", "Play tape: " + t.title);
+    b.style.setProperty("--accent", ACCENTS[i % ACCENTS.length]);
     b.innerHTML =
-      '<span class="label"><b>' + t.short + '</b><small>' + t.blurb + "</small></span>" +
-      '<span class="reels"><span class="reel"></span><span class="reel"></span></span>' +
+      '<span class="spine-tab">BMO·0' + (i + 1) + '</span>' +
+      '<span class="label"><b>' + t.short + '</b><small>' + t.blurb + '</small><span class="stripes"></span></span>' +
+      '<span class="window"><span class="tape-line"></span>' +
+      '<span class="reel left"></span><span class="reel right"></span>' +
+      '<span class="screws"><i></i><i></i><i></i><i></i></span></span>' +
       '<a class="watch-link" href="https://www.youtube.com/watch?v=' + t.id +
       '" target="_blank" rel="noopener">watch on YouTube ↗</a>';
-    const play = () => { BMOAudio.unlock(); insertTape(i); };
+    const play = () => { BMOAudio.unlock(); flyTape(b, i); };
     b.addEventListener("click", (e) => {
       if (e.target.closest(".watch-link")) return; // let the link work
       play();
@@ -70,12 +83,42 @@ function buildShelf() {
     shelf.appendChild(b);
   });
 }
+/* ---------------- tape fly-to-BMO ---------------- */
+function flyTape(el, i) {
+  wakeBMO();
+  if (reduceMotion) { insertTape(i); return; }
+  const r = el.getBoundingClientRect(), s = screen.getBoundingClientRect();
+  const ghost = el.cloneNode(true);
+  ghost.className = "tape tape-fly";
+  Object.assign(ghost.style, {
+    left: r.left + "px", top: r.top + "px",
+    width: r.width + "px", height: r.height + "px",
+  });
+  document.body.appendChild(ghost);
+  const dx = s.left + s.width / 2 - (r.left + r.width / 2);
+  const dy = s.top + s.height / 2 - (r.top + r.height / 2);
+  ghost.animate([
+    { transform: "translate(0,0) scale(1) rotate(0deg)", opacity: 1 },
+    { transform: `translate(${dx * 0.7}px,${dy * 0.7}px) scale(.6) rotate(-8deg)`, opacity: .9, offset: .7 },
+    { transform: `translate(${dx}px,${dy}px) scale(.15) rotate(8deg)`, opacity: 0 },
+  ], { duration: 480, easing: "cubic-bezier(.3,.7,.3,1)" }).onfinish = () => ghost.remove();
+  setTimeout(() => insertTape(i), 380);
+}
 function markActive() {
   [...shelf.children].forEach((el) => {
     const active = pos >= 0 && order[pos] === +el.dataset.i;
     el.classList.toggle("active", active);
     el.classList.toggle("playing", active && playing);
   });
+  renderUpNext();
+}
+function renderUpNext() {
+  const items = [];
+  for (let k = 1; k <= 3; k++) {
+    const idx = order[(pos + k) % order.length];
+    if (idx !== undefined && TAPES[idx]) items.push(TAPES[idx].short);
+  }
+  upnextList.textContent = items.length ? items.join("  ·  ") : "—";
 }
 
 /* ---------------- CRT static transition ---------------- */
@@ -110,6 +153,8 @@ function insertTape(i) {
     face.classList.add("hidden");
     screen.classList.add("playing");
     started = true; playing = true;
+    if (!fallbackMode) transport.classList.remove("dim");
+    pfill.style.width = "0%"; tCur.textContent = "0:00"; tDur.textContent = "0:00";
     say("Now playing: " + tape.title);
     nowPlaying.querySelector("span").textContent = "▶ " + tape.title;
     nowPlaying.classList.add("show");
@@ -273,15 +318,19 @@ function fireflies() {
   })();
 }
 
-/* ---------------- easter eggs: type "bmo" / "football" ---------------- */
+/* ---------------- keyboard ---------------- */
 let keys = "";
 addEventListener("keydown", (e) => {
   if (e.target instanceof Element && e.target.matches("input,textarea")) return;
-  if (e.code === "Space") { e.preventDefault(); togglePlay(); }
-  else if (e.key === "ArrowRight") nextTape(false);
-  else if (e.key === "ArrowLeft") prevTape();
-  else if (e.key === "m" || e.key === "M") toggleMusic();
-  else if (e.key === "f" || e.key === "F") toggleFull();
+  const interactive = e.target instanceof Element &&
+    !!e.target.closest("button, input, a, [role='button'], [role='slider']");
+  if (e.key === "Escape" && !help.hidden) { toggleHelp(false); return; }
+  if (e.code === "Space" && !interactive) { e.preventDefault(); togglePlay(); }
+  else if (e.key === "ArrowRight" && !interactive) nextTape(false);
+  else if (e.key === "ArrowLeft" && !interactive) prevTape();
+  else if ((e.key === "m" || e.key === "M") && !interactive) toggleMusic();
+  else if ((e.key === "f" || e.key === "F") && !interactive) toggleFull();
+  else if (e.key === "?") toggleHelp();
   keys = (keys + e.key.toLowerCase()).slice(-8);
   if (keys.endsWith("bmo")) {
     BMOAudio.sfx.bmo();
@@ -304,6 +353,85 @@ addEventListener("keydown", (e) => {
   }
 });
 
+/* ---------------- progress + seek + volume ---------------- */
+function fmtTime(s) {
+  s = Math.max(0, Math.floor(s || 0));
+  return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+}
+setInterval(() => {
+  if (!ytReady || !yt || !started || fallbackMode) return;
+  try {
+    const cur = yt.getCurrentTime() || 0, dur = yt.getDuration() || 0;
+    if (dur > 0) {
+      const pct = (cur / dur) * 100;
+      pfill.style.width = pct + "%";
+      pbar.setAttribute("aria-valuenow", String(Math.round(pct)));
+      tCur.textContent = fmtTime(cur); tDur.textContent = fmtTime(dur);
+    }
+  } catch (err) { /* player not ready yet */ }
+}, 500);
+function seekFromPoint(clientX) {
+  if (!ytReady || !yt || fallbackMode || !started) return;
+  const r = pbar.getBoundingClientRect();
+  const frac = Math.min(1, Math.max(0, (clientX - r.left) / r.width));
+  try {
+    yt.seekTo(frac * (yt.getDuration() || 0), true);
+    BMOAudio.sfx.seek();
+  } catch (err) {}
+}
+let volBlipT = 0;
+
+/* ---------------- sleepy BMO ---------------- */
+let lastActive = Date.now(), sleepy = false;
+["pointerdown", "keydown", "touchstart"].forEach((ev) =>
+  addEventListener(ev, () => {
+    lastActive = Date.now();
+    if (sleepy) wakeBMO();
+  }, { passive: true }));
+function wakeBMO() {
+  if (!sleepy) return;
+  sleepy = false;
+  face.classList.remove("sleepy");
+  BMOAudio.sfx.wake();
+  say("I'm awake! Pick a tape!");
+}
+setInterval(() => {
+  if (sleepy || started || face.classList.contains("hidden")) return;
+  if (Date.now() - lastActive > 45000) {
+    sleepy = true;
+    face.classList.add("sleepy");
+    if (!face.querySelector(".zzz")) {
+      face.insertAdjacentHTML("beforeend",
+        '<span class="zzz">z</span><span class="zzz z2">z</span><span class="zzz z3">z</span>');
+    }
+    BMOAudio.sfx.yawn();
+    say("BMO is getting sleepy… tap to wake!");
+  }
+}, 5000);
+
+/* ---------------- help ---------------- */
+function toggleHelp(force) {
+  const show = force !== undefined ? force : help.hidden;
+  help.hidden = !show;
+  if (show) BMOAudio.sfx.click();
+}
+
+/* ---------------- boot ---------------- */
+function boot() {
+  transport.classList.add("dim");
+  renderUpNext();
+  setTimeout(() => {
+    bootEl.classList.add("done");
+    say("Pick a tape! BMO plays BMO stuff only.");
+    setTimeout(() => bootEl.remove(), 700);
+  }, reduceMotion ? 300 : 1700);
+}
+// first tap anywhere = power-on chime (AudioContext needs a gesture)
+addEventListener("pointerdown", function firstBoot() {
+  removeEventListener("pointerdown", firstBoot);
+  BMOAudio.sfx.boot();
+}, { passive: true });
+
 /* ---------------- buttons ---------------- */
 function toggleMusic() {
   const on = BMOAudio.setMusic(!BMOAudio.isMusicOn());
@@ -325,9 +453,27 @@ function bind() {
   $("btnMusic").onclick = toggleMusic;
   $("btnFull").onclick = toggleFull;
   $("btnQuote").onclick = sayQuote;
+  $("btnHelp").onclick = () => toggleHelp();
+  $("btnHelpClose").onclick = () => toggleHelp(false);
+  help.addEventListener("click", (e) => { if (e.target === help) toggleHelp(false); });
+  pbar.addEventListener("pointerdown", (e) => seekFromPoint(e.clientX));
+  pbar.addEventListener("keydown", (e) => {
+    if (!ytReady || !yt || fallbackMode || !started) return;
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+      e.preventDefault(); e.stopPropagation();
+      try {
+        yt.seekTo((yt.getCurrentTime() || 0) + (e.key === "ArrowRight" ? 10 : -10), true);
+        BMOAudio.sfx.seek();
+      } catch (err) {}
+    }
+  });
+  vol.addEventListener("input", () => {
+    if (ytReady && yt && !fallbackMode) { try { yt.setVolume(+vol.value); } catch (err) {} }
+    const now = Date.now();
+    if (now - volBlipT > 140) { volBlipT = now; BMOAudio.sfx.volBlip(); }
+  });
 }
 
 /* ---------------- go ---------------- */
-buildShelf(); bind(); blinkLoop(); fireflies();
-say("Pick a tape! BMO plays BMO stuff only.");
+buildShelf(); bind(); blinkLoop(); fireflies(); boot();
 })();

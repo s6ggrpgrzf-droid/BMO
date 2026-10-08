@@ -65,6 +65,18 @@ const BMOAudio = (() => {
     bmo()    { if (!unlock()) return;           // easter-egg jingle
                [392, 523, 659, 784, 659, 784].forEach((f, i) =>
                  tone({freq: f, dur: .12, type: "triangle", vol: .35, when: i * .08})); },
+    boot()   { if (!unlock()) return;           // power-on chime
+               tone({freq: 262, dur: .12, type: "triangle", vol: .35});
+               tone({freq: 392, dur: .12, type: "triangle", vol: .35, when: .1});
+               tone({freq: 523, dur: .22, type: "triangle", vol: .4, when: .2}); },
+    seek()   { if (!unlock()) return;
+               tone({freq: 880, dur: .04, type: "square", vol: .15}); },
+    volBlip(){ if (!unlock()) return;
+               tone({freq: 700, dur: .05, type: "sine", vol: .25}); },
+    yawn()   { if (!unlock()) return;           // sleepy descending sigh
+               tone({freq: 420, dur: .5, type: "sine", vol: .3, slide: -220}); },
+    wake()   { if (!unlock()) return;
+               tone({freq: 300, dur: .1, type: "square", vol: .25, slide: 300}); },
   };
 
   /* ---------- generative chiptune ---------- */
