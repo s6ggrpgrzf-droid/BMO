@@ -384,3 +384,79 @@ body{
   .aurora{display:none;}
   .floatie,.shoot{animation:none !important; display:none;}
 }
+
+/* ---------- new in the "all except 8" update ---------- */
+/* sleep timer badge */
+.cbtn.mini{position:relative;}
+.sleep-badge{position:absolute; top:2px; right:4px; font-size:.6rem; font-weight:700;
+  color:#0b2b33; background:#ffd75e; border-radius:8px; padding:0 5px; line-height:1.5;
+  display:none;}
+.sleep-badge:not(:empty){display:block;}
+
+/* resume strip */
+.resume{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:0 0 12px;
+  padding:10px 14px; background:rgba(95,195,174,.12); border:1px solid rgba(95,195,174,.4);
+  border-radius:14px;}
+.resume-label{font-weight:700; color:#9fe8d2; font-size:.9rem;}
+.resume-chips{display:flex; gap:8px; flex-wrap:wrap;}
+.resume-chip{border:1px solid rgba(255,215,94,.55); background:rgba(255,215,94,.12); color:#ffe9a8;
+  border-radius:999px; padding:7px 14px; font:inherit; font-size:.85rem; cursor:pointer;
+  transition:transform .12s ease, background .12s ease;}
+.resume-chip:hover{background:rgba(255,215,94,.28); transform:translateY(-1px);}
+.resume-chip b{color:#fff;}
+
+/* collection shelf */
+.collection-section{margin:26px 0 0; text-align:center;}
+.collection-section h2{font-size:1.05rem; letter-spacing:.06em; color:#9fe8d2; margin:0 0 10px;}
+.coll-count{color:#ffd75e; font-size:.85em;}
+.coll-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:10px;
+  max-width:640px; margin:0 auto;}
+.coll-cell{border-radius:10px; padding:12px 6px 10px; background:rgba(255,255,255,.05);
+  border:1px dashed rgba(255,255,255,.22); color:#5b6b72; cursor:default;
+  display:flex; flex-direction:column; gap:6px; align-items:center; min-height:74px;
+  justify-content:center; transition:transform .15s ease;}
+.coll-cell.got{background:color-mix(in srgb, var(--accent) 22%, transparent);
+  border:1px solid var(--accent); color:#fff; cursor:pointer;}
+.coll-cell.got:hover{transform:translateY(-2px);}
+.coll-cell b{font-size:.68rem; letter-spacing:.04em;}
+.coll-tab{font-size:.62rem; font-weight:700; letter-spacing:.08em; opacity:.85;}
+
+/* reaction bubble */
+.react-pop{position:absolute; right:10px; bottom:12px; display:flex; align-items:center; gap:8px;
+  background:rgba(11,43,51,.88); border:2px solid #5fc3ae; border-radius:16px;
+  padding:8px 12px 8px 8px; pointer-events:none; opacity:0; transform:translateY(10px) scale(.9);
+  transition:opacity .22s ease, transform .22s cubic-bezier(.3,1.4,.5,1); z-index:5;}
+.react-pop.show{opacity:1; transform:translateY(0) scale(1);}
+.rface{width:44px; height:52px; background:#5fc3ae; border-radius:12px; position:relative; flex:0 0 auto;}
+.reye{position:absolute; top:14px; width:9px; height:13px; background:#0b2b33; border-radius:50%;}
+.reye.l{left:9px;} .reye.r{right:9px;}
+.rmouth{position:absolute; left:50%; bottom:10px; width:16px; height:9px;
+  border:2.5px solid #0b2b33; border-top:0; border-left:0; border-right:0; border-radius:0 0 20px 20px;
+  transform:translateX(-50%);}
+.rface.happy .reye{height:6px; top:17px; border-radius:6px;}
+.rface.happy .rmouth{width:20px; height:11px;}
+.rface.gasp .reye{width:12px; height:16px;}
+.rface.gasp .rmouth{width:12px; height:12px; border:2.5px solid #0b2b33; border-radius:50%;}
+.rface.love .reye{background:transparent; width:14px; height:14px; top:12px;}
+.rface.love .reye::before{content:"♥"; color:#ff5d7e; font-size:15px; line-height:1;}
+.rface.love .rmouth{width:18px; height:10px;}
+.rtext{color:#fff; font-size:.85rem; font-weight:600; white-space:nowrap;}
+
+/* VHS rewind / FF overlay */
+.rewind-fx{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  pointer-events:none; opacity:0; z-index:4;
+  background:repeating-linear-gradient(0deg, rgba(255,255,255,.09) 0 2px, transparent 2px 5px);}
+.rewind-fx.on{opacity:1; animation:trackjitter .18s steps(2) infinite;}
+.rewind-fx span{font-size:1.6rem; font-weight:700; letter-spacing:.12em; color:#fff;
+  text-shadow:0 0 12px #5fc3ae, 0 2px 0 #000;}
+@keyframes trackjitter{
+  0%{transform:translateY(0);} 50%{transform:translateY(-3px);} 100%{transform:translateY(2px);}}
+
+/* heart burst bits */
+.heart-bit{position:fixed; z-index:60; font-size:1.4rem; pointer-events:none;
+  text-shadow:0 0 8px currentColor;}
+
+@media (prefers-reduced-motion: reduce){
+  .react-pop{transition:none;}
+  .rewind-fx.on{animation:none;}
+}

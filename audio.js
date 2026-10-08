@@ -77,6 +77,13 @@ const BMOAudio = (() => {
                tone({freq: 420, dur: .5, type: "sine", vol: .3, slide: -220}); },
     wake()   { if (!unlock()) return;
                tone({freq: 300, dur: .1, type: "square", vol: .25, slide: 300}); },
+    giggle() { if (!unlock()) return;           // BMO giggle: three rising blips
+               [660, 830, 990].forEach((f, i) =>
+                 tone({freq: f, dur: .09, type: "square", vol: .22, when: i * .07, slide: 120})); },
+    rew()    { if (!unlock()) return;           // VHS rewind whir
+               tone({freq: 1200, dur: .35, type: "sawtooth", vol: .12, slide: -700}); },
+    ff()     { if (!unlock()) return;           // VHS fast-forward whir
+               tone({freq: 500, dur: .35, type: "sawtooth", vol: .12, slide: 700}); },
   };
 
   /* ---------- generative chiptune ---------- */
