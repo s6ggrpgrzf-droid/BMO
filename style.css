@@ -161,6 +161,11 @@ body{
 .cbtn.big{width:clamp(64px,16vw,84px); font-size:clamp(1.5rem,5vw,2rem);}
 .cbtn.mini{width:clamp(42px,10.5vw,52px); font-size:clamp(1rem,3.4vw,1.25rem);}
 .cbtn.on{outline:3px solid #fff; box-shadow:0 5px 0 #a37c22, 0 0 18px #fff;}
+.cbtn svg{width:44%; height:44%; display:block; flex:0 0 auto;}
+.cbtn.big svg{width:48%; height:48%;}
+.cbtn .ic-pause{display:none;}
+.cbtn.is-pause .ic-play{display:none;}
+.cbtn.is-pause .ic-pause{display:block;}
 .grille{display:flex; gap:8px; opacity:.5;}
 .grille i{width:8px; height:8px; border-radius:50%; background:rgba(16,38,46,.7);
   box-shadow:inset 0 1px 2px rgba(0,0,0,.6);}

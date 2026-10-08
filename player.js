@@ -265,7 +265,7 @@ function togglePlay() {
   else { yt.playVideo(); BMOAudio.sfx.click(); }
 }
 function updatePlayBtn() {
-  $("btnPlay").textContent = playing ? "⏸" : "▶";
+  $("btnPlay").classList.toggle("is-pause", playing);
 }
 function toggleShuffle() {
   shuffleOn = !shuffleOn;
