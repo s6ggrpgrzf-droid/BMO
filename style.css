@@ -172,7 +172,9 @@ body{
 
 /* ---------- tape shelf ---------- */
 .shelf-section{width:100%; margin-top:34px; text-align:center;}
-.shelf-section h2{margin:0 0 10px; font-size:1.15rem; letter-spacing:.1em; color:#ffe9a8;}
+.shelf-section h2{margin:0 0 12px; font-family:'Fredoka',ui-rounded,'SF Pro Rounded','Trebuchet MS',system-ui,sans-serif;
+  font-weight:600; font-size:1.35rem; letter-spacing:.24em; text-transform:uppercase; color:#ffe9a8;
+  text-shadow:0 2px 0 rgba(0,0,0,.35), 0 0 18px rgba(255,215,94,.28);}
 /* ---------- tape carousel ---------- */
 .carousel{display:flex; align-items:center; gap:8px; width:100%; margin-top:4px;}
 .car-viewport{overflow:hidden; flex:1; padding:20px 4px 24px; touch-action:pan-y; cursor:grab;}
