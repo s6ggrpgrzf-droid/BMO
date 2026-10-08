@@ -101,10 +101,13 @@ function layoutCarousel(animate = true) {
   track.style.transform = `translateX(${x}px)`;
   if (!animate) { void track.offsetWidth; track.classList.remove("no-anim"); }
   [...track.children].forEach((cell, i) => {
-    const a = Math.min(Math.abs(i - carIndex), 2);
-    cell.style.transform = `scale(${1 - a * 0.14})`;
-    cell.style.opacity = `${1 - a * 0.28}`;
-    cell.style.filter = `brightness(${1 - a * 0.18})`;
+    const d = i - carIndex, a = Math.min(Math.abs(d), 2);
+    const side = d === 0 ? 0 : (d > 0 ? 1 : -1);
+    const tilt = -side * (a === 0 ? 0 : a === 1 ? 30 : 46);
+    const s = d === 0 ? 1.06 : 1 - a * 0.14;
+    cell.style.transform = `perspective(1000px) rotateY(${tilt}deg) scale(${s})`;
+    cell.style.opacity = `${1 - a * 0.26}`;
+    cell.style.filter = `brightness(${(1 - a * 0.18).toFixed(2)}) saturate(${(1 - a * 0.12).toFixed(2)})`;
     cell.style.zIndex = `${10 - a}`;
   });
   [...dotsBox.children].forEach((d, i) => d.classList.toggle("on", i === carIndex));
